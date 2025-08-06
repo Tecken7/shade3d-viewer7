@@ -24,11 +24,18 @@ function Model({ url, color, opacity, visible }) {
     return visible ? <primitive object={obj} /> : null
 }
 
-// ✅ Bezpečně uvnitř <Canvas>
-function SceneLights({ lightIntensity, lightPosX, lightPosY, lightPosZ, dirLightRef1, dirLightRef2 }) {
+function SceneLights({
+    lightIntensity,
+    lightPosX, lightPosY, lightPosZ,
+    light2PosX, light2PosY, light2PosZ,
+    dirLightRef1, dirLightRef2
+}) {
     useFrame(() => {
         if (dirLightRef1.current) {
             dirLightRef1.current.position.set(lightPosX, lightPosY, lightPosZ)
+        }
+        if (dirLightRef2.current) {
+            dirLightRef2.current.position.set(light2PosX, light2PosY, light2PosZ)
         }
     })
 
@@ -36,7 +43,7 @@ function SceneLights({ lightIntensity, lightPosX, lightPosY, lightPosZ, dirLight
         <>
             <ambientLight intensity={lightIntensity * 0.4} />
             <directionalLight ref={dirLightRef1} position={[lightPosX, lightPosY, lightPosZ]} intensity={lightIntensity * 1.5} />
-            <directionalLight ref={dirLightRef2} position={[-5, -5, -5]} intensity={lightIntensity * 1.0} />
+            <directionalLight ref={dirLightRef2} position={[light2PosX, light2PosY, light2PosZ]} intensity={lightIntensity * 1.0} />
         </>
     )
 }
@@ -52,16 +59,22 @@ export default function Page() {
     const [visible2, setVisible2] = useState(true)
     const [visible3, setVisible3] = useState(true)
     const [lightIntensity, setLightIntensity] = useState(1)
+
+    // světlo 1
     const [lightPosX, setLightPosX] = useState(5)
     const [lightPosY, setLightPosY] = useState(5)
     const [lightPosZ, setLightPosZ] = useState(5)
+
+    // světlo 2
+    const [light2PosX, setLight2PosX] = useState(-5)
+    const [light2PosY, setLight2PosY] = useState(-5)
+    const [light2PosZ, setLight2PosZ] = useState(-5)
 
     const dirLightRef1 = useRef()
     const dirLightRef2 = useRef()
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
-            {/* UI Panel */}
             <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, color: 'white', fontFamily: 'sans-serif' }}>
                 <div>Upper:</div>
                 <input type="color" value={color1} onChange={(e) => setColor1(e.target.value)} />
@@ -84,19 +97,26 @@ export default function Page() {
                     {visible3 ? '👁️' : '🚫'}
                 </button>
 
-                <div style={{ marginTop: '10px' }}>💡 Scene Light:</div>
+                <div style={{ marginTop: '10px' }}>💡 Light Intensity:</div>
                 <input type="range" min={0} max={2} step={0.01} value={lightIntensity} onChange={(e) => setLightIntensity(parseFloat(e.target.value))} />
 
-                <div style={{ marginTop: '10px' }}>🔦 Light Position:</div>
-                <label>X: </label>
+                <div style={{ marginTop: '10px' }}>🔦 Light 1 Position:</div>
+                <label>X:</label>
                 <input type="range" min={-10} max={10} step={0.1} value={lightPosX} onChange={(e) => setLightPosX(parseFloat(e.target.value))} /><br />
-                <label>Y: </label>
+                <label>Y:</label>
                 <input type="range" min={-10} max={10} step={0.1} value={lightPosY} onChange={(e) => setLightPosY(parseFloat(e.target.value))} /><br />
-                <label>Z: </label>
+                <label>Z:</label>
                 <input type="range" min={-10} max={10} step={0.1} value={lightPosZ} onChange={(e) => setLightPosZ(parseFloat(e.target.value))} />
+
+                <div style={{ marginTop: '10px' }}>💡 Light 2 Position:</div>
+                <label>X:</label>
+                <input type="range" min={-10} max={10} step={0.1} value={light2PosX} onChange={(e) => setLight2PosX(parseFloat(e.target.value))} /><br />
+                <label>Y:</label>
+                <input type="range" min={-10} max={10} step={0.1} value={light2PosY} onChange={(e) => setLight2PosY(parseFloat(e.target.value))} /><br />
+                <label>Z:</label>
+                <input type="range" min={-10} max={10} step={0.1} value={light2PosZ} onChange={(e) => setLight2PosZ(parseFloat(e.target.value))} />
             </div>
 
-            {/* 3D Canvas */}
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
                 <Suspense fallback={null}>
                     <SceneLights
@@ -104,6 +124,9 @@ export default function Page() {
                         lightPosX={lightPosX}
                         lightPosY={lightPosY}
                         lightPosZ={lightPosZ}
+                        light2PosX={light2PosX}
+                        light2PosY={light2PosY}
+                        light2PosZ={light2PosZ}
                         dirLightRef1={dirLightRef1}
                         dirLightRef2={dirLightRef2}
                     />
@@ -112,13 +135,13 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
-                <OrbitControls 
-                    enablePan={true} 
-                    enableZoom={true} 
-                    minPolarAngle={0} 
-                    maxPolarAngle={Math.PI} 
-                    minAzimuthAngle={-Infinity} 
-                    maxAzimuthAngle={Infinity} 
+                <OrbitControls
+                    enablePan={true}
+                    enableZoom={true}
+                    minPolarAngle={0}
+                    maxPolarAngle={Math.PI}
+                    minAzimuthAngle={-Infinity}
+                    maxAzimuthAngle={Infinity}
                 />
             </Canvas>
         </div>
