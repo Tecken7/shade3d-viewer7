@@ -1,10 +1,23 @@
 'use client'
 
-import { Canvas, useLoader, useFrame } from '@react-three/fiber'
+import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber'
 import { TrackballControls } from '@react-three/drei'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
 import { Suspense, useState, useRef } from 'react'
+
+// Fix pro zoom in/out s orthographic kamerou
+function FixZoomLimits() {
+    const { camera } = useThree()
+
+    useFrame(() => {
+        if (camera.zoom < 0.5) camera.zoom = 0.5
+        if (camera.zoom > 100) camera.zoom = 100
+        camera.updateProjectionMatrix()
+    })
+
+    return null
+}
 
 function Model({ url, color, opacity, visible }) {
     const obj = useLoader(OBJLoader, url)
@@ -60,12 +73,10 @@ export default function Page() {
     const [visible3, setVisible3] = useState(true)
     const [lightIntensity, setLightIntensity] = useState(1)
 
-    // světlo 1
     const [lightPosX, setLightPosX] = useState(5)
     const [lightPosY, setLightPosY] = useState(5)
     const [lightPosZ, setLightPosZ] = useState(5)
 
-    // světlo 2
     const [light2PosX, setLight2PosX] = useState(-5)
     const [light2PosY, setLight2PosY] = useState(-5)
     const [light2PosZ, setLight2PosZ] = useState(-5)
@@ -118,6 +129,7 @@ export default function Page() {
             </div>
 
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
+                <FixZoomLimits />
                 <Suspense fallback={null}>
                     <SceneLights
                         lightIntensity={lightIntensity}
@@ -135,12 +147,11 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
-                {/* ✅ TrackballControls s vyšší citlivostí */}
                 <TrackballControls
                     noZoom={false}
                     noPan={false}
                     staticMoving={true}
-                    rotateSpeed={4}
+                    rotateSpeed={5}
                     zoomSpeed={1.2}
                     panSpeed={0.8}
                 />
