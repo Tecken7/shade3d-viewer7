@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas, useLoader, useFrame } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { TrackballControls } from '@react-three/drei'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
 import { Suspense, useState, useRef } from 'react'
@@ -118,6 +118,7 @@ export default function Page() {
                 <input type="range" min={-10} max={10} step={0.1} value={light2PosZ} onChange={(e) => setLight2PosZ(parseFloat(e.target.value))} />
             </div>
 
+            {/* 3D Viewer */}
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
                 <Suspense fallback={null}>
                     <SceneLights
@@ -136,15 +137,11 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
-                {/* ✅ OrbitControls s plynulou rotací (žádné zamrznutí na pólech) */}
-                <OrbitControls
-                    enablePan={true}
-                    enableZoom={true}
-                    enableRotate={true}
-                    minPolarAngle={0.001}
-                    maxPolarAngle={Math.PI - 0.001}
-                    minAzimuthAngle={-Infinity}
-                    maxAzimuthAngle={Infinity}
+                {/* ✅ TrackballControls = plynulá 360° kamera */}
+                <TrackballControls
+                    noZoom={false}
+                    noPan={false}
+                    staticMoving={true}
                 />
             </Canvas>
         </div>
