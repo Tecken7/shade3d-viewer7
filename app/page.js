@@ -146,7 +146,7 @@ export default function Page() {
                     noZoom={true}
                     noPan={false}
                     staticMoving={true}
-                    rotateSpeed={2.5}
+                    rotateSpeed={5}
                     panSpeed={0.8}
                 />
             </Canvas>
