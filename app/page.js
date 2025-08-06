@@ -140,7 +140,7 @@ export default function Page() {
                     noZoom={false}
                     noPan={false}
                     staticMoving={true}
-                    rotateSpeed={2.5}
+                    rotateSpeed={4}
                     zoomSpeed={1.2}
                     panSpeed={0.8}
                 />
