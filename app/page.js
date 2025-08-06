@@ -34,7 +34,7 @@ function TouchTrackballControls() {
         const controls = new TrackballControls(camera, gl.domElement)
         controls.rotateSpeed = 5.0
         controls.zoomSpeed = 1.2
-        controls.panSpeed = 0.8
+        controls.panSpeed = 3
         controls.staticMoving = true
         controlsRef.current = controls
 
