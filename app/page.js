@@ -75,7 +75,6 @@ export default function Page() {
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
-            {/* UI Panel */}
             <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, color: 'white', fontFamily: 'sans-serif' }}>
                 <div>Upper:</div>
                 <input type="color" value={color1} onChange={(e) => setColor1(e.target.value)} />
@@ -118,7 +117,6 @@ export default function Page() {
                 <input type="range" min={-10} max={10} step={0.1} value={light2PosZ} onChange={(e) => setLight2PosZ(parseFloat(e.target.value))} />
             </div>
 
-            {/* 3D Viewer */}
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
                 <Suspense fallback={null}>
                     <SceneLights
@@ -137,11 +135,14 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
-                {/* ✅ TrackballControls = plynulá 360° kamera */}
+                {/* ✅ TrackballControls s vyšší citlivostí */}
                 <TrackballControls
                     noZoom={false}
                     noPan={false}
                     staticMoving={true}
+                    rotateSpeed={2.5}
+                    zoomSpeed={1.2}
+                    panSpeed={0.8}
                 />
             </Canvas>
         </div>
