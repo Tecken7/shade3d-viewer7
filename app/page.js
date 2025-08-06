@@ -4,23 +4,7 @@ import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber'
 import { TrackballControls } from '@react-three/drei'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
-import { Suspense, useState, useRef } from 'react'
-
-// Oprava zoom-out limitu pro orthographic kameru
-function FixZoomLimits() {
-    const { camera } = useThree()
-    useFrame(() => {
-        if (camera.zoom < 0.5) {
-            camera.zoom = 0.5
-            camera.updateProjectionMatrix()
-        }
-        if (camera.zoom > 100) {
-            camera.zoom = 100
-            camera.updateProjectionMatrix()
-        }
-    })
-    return null
-}
+import { Suspense, useState, useRef, useEffect } from 'react'
 
 function Model({ url, color, opacity, visible }) {
     const obj = useLoader(OBJLoader, url)
@@ -62,6 +46,25 @@ function SceneLights({
             <directionalLight ref={dirLightRef2} intensity={lightIntensity * 1.0} />
         </>
     )
+}
+
+function CustomZoomHandler() {
+    const { camera } = useThree()
+
+    useEffect(() => {
+        const onWheel = (e) => {
+            e.preventDefault()
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1
+            camera.zoom *= zoomFactor
+            camera.zoom = Math.min(Math.max(camera.zoom, 0.5), 100)
+            camera.updateProjectionMatrix()
+        }
+
+        window.addEventListener('wheel', onWheel, { passive: false })
+        return () => window.removeEventListener('wheel', onWheel)
+    }, [camera])
+
+    return null
 }
 
 export default function Page() {
@@ -120,7 +123,7 @@ export default function Page() {
             </div>
 
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
-                <FixZoomLimits />
+                <CustomZoomHandler />
 
                 <Suspense fallback={null}>
                     <SceneLights
@@ -140,11 +143,10 @@ export default function Page() {
                 </Suspense>
 
                 <TrackballControls
-                    noZoom={false}
+                    noZoom={true}
                     noPan={false}
                     staticMoving={true}
                     rotateSpeed={2.5}
-                    zoomSpeed={1.2}
                     panSpeed={0.8}
                 />
             </Canvas>
