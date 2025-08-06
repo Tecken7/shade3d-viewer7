@@ -1,10 +1,10 @@
 'use client'
 
-import { Canvas, useLoader } from '@react-three/fiber'
-import { MapControls } from '@react-three/drei'
+import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber'
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
-import { Suspense, useState, useRef } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 
 function Model({ url, color, opacity, visible }) {
     const obj = useLoader(OBJLoader, url)
@@ -24,6 +24,45 @@ function Model({ url, color, opacity, visible }) {
     })
 
     return visible ? <primitive object={obj} /> : null
+}
+
+function TouchTrackballControls() {
+    const { camera, gl } = useThree()
+    const controlsRef = useRef()
+
+    useEffect(() => {
+        const controls = new TrackballControls(camera, gl.domElement)
+        controls.rotateSpeed = 5.0
+        controls.zoomSpeed = 1.2
+        controls.panSpeed = 0.8
+        controls.staticMoving = true
+        controlsRef.current = controls
+
+        const handleTouchStart = (event) => {
+            event.preventDefault()
+            controls.handleTouchStart(event)
+        }
+
+        const handleTouchMove = (event) => {
+            event.preventDefault()
+            controls.handleTouchMove(event)
+        }
+
+        gl.domElement.addEventListener('touchstart', handleTouchStart, { passive: false })
+        gl.domElement.addEventListener('touchmove', handleTouchMove, { passive: false })
+
+        return () => {
+            gl.domElement.removeEventListener('touchstart', handleTouchStart)
+            gl.domElement.removeEventListener('touchmove', handleTouchMove)
+            controls.dispose()
+        }
+    }, [camera, gl])
+
+    useFrame(() => {
+        controlsRef.current?.update()
+    })
+
+    return null
 }
 
 export default function Page() {
@@ -99,14 +138,7 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
-                <MapControls
-                    enablePan={true}
-                    enableZoom={true}
-                    enableRotate={true}
-                    zoomSpeed={1.2}
-                    rotateSpeed={1.4}
-                    panSpeed={0.8}
-                />
+                <TouchTrackballControls />
             </Canvas>
         </div>
     )
