@@ -1,36 +1,12 @@
 'use client'
 
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
+import { Canvas, useLoader, useFrame } from '@react-three/fiber'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
-import { Suspense, useState, useRef, useCallback } from 'react'
+import { Suspense, useState, useRef } from 'react'
 
-function DraggableModel({ url, color, opacity, visible }) {
+function Model({ url, color, opacity, visible }) {
     const obj = useLoader(OBJLoader, url)
-    const groupRef = useRef()
-
-    const isDragging = useRef(false)
-    const previousX = useRef(0)
-
-    const handlePointerDown = useCallback((e) => {
-        isDragging.current = true
-        previousX.current = e.clientX || e.touches?.[0]?.clientX || 0
-    }, [])
-
-    const handlePointerMove = useCallback((e) => {
-        if (!isDragging.current) return
-        const clientX = e.clientX || e.touches?.[0]?.clientX || 0
-        const deltaX = clientX - previousX.current
-        previousX.current = clientX
-        if (groupRef.current) {
-            groupRef.current.rotation.y += deltaX * 0.01
-        }
-    }, [])
-
-    const handlePointerUp = useCallback(() => {
-        isDragging.current = false
-    }, [])
-
     const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(color),
         transparent: true,
@@ -39,27 +15,12 @@ function DraggableModel({ url, color, opacity, visible }) {
         roughness: 0.5,
         side: THREE.DoubleSide,
     })
-
     obj.traverse((child) => {
         if (child.isMesh) {
             child.material = material
         }
     })
-
-    return visible ? (
-        <group
-            ref={groupRef}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}
-            onTouchStart={handlePointerDown}
-            onTouchMove={handlePointerMove}
-            onTouchEnd={handlePointerUp}
-        >
-            <primitive object={obj} />
-        </group>
-    ) : null
+    return visible ? <primitive object={obj} /> : null
 }
 
 export default function Page() {
@@ -74,8 +35,18 @@ export default function Page() {
     const [visible3, setVisible3] = useState(true)
     const [lightIntensity, setLightIntensity] = useState(1)
 
+    const [lightPosX, setLightPosX] = useState(5)
+    const [lightPosY, setLightPosY] = useState(5)
+    const [lightPosZ, setLightPosZ] = useState(5)
+
     const dirLightRef1 = useRef()
     const dirLightRef2 = useRef()
+
+    useFrame(() => {
+        if (dirLightRef1.current) {
+            dirLightRef1.current.position.set(lightPosX, lightPosY, lightPosZ)
+        }
+    })
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -103,18 +74,35 @@ export default function Page() {
 
                 <div style={{ marginTop: '10px' }}>💡 Scene Light:</div>
                 <input type="range" min={0} max={2} step={0.01} value={lightIntensity} onChange={(e) => setLightIntensity(parseFloat(e.target.value))} />
+
+                <div style={{ marginTop: '10px' }}>🔦 Light Position:</div>
+                <label>X: </label>
+                <input type="range" min={-10} max={10} step={0.1} value={lightPosX} onChange={(e) => setLightPosX(parseFloat(e.target.value))} /><br />
+                <label>Y: </label>
+                <input type="range" min={-10} max={10} step={0.1} value={lightPosY} onChange={(e) => setLightPosY(parseFloat(e.target.value))} /><br />
+                <label>Z: </label>
+                <input type="range" min={-10} max={10} step={0.1} value={lightPosZ} onChange={(e) => setLightPosZ(parseFloat(e.target.value))} />
             </div>
 
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
                 <ambientLight intensity={lightIntensity * 0.4} />
-                <directionalLight ref={dirLightRef1} position={[5, 5, 5]} intensity={lightIntensity * 1.5} />
+                <directionalLight ref={dirLightRef1} position={[lightPosX, lightPosY, lightPosZ]} intensity={lightIntensity * 1.5} />
                 <directionalLight ref={dirLightRef2} position={[-5, -5, -5]} intensity={lightIntensity * 1.0} />
 
                 <Suspense fallback={null}>
-                    <DraggableModel url="/models/Upper.obj" color={color1} opacity={opacity1} visible={visible1} />
-                    <DraggableModel url="/models/Lower.obj" color={color2} opacity={opacity2} visible={visible2} />
-                    <DraggableModel url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
+                    <Model url="/models/Upper.obj" color={color1} opacity={opacity1} visible={visible1} />
+                    <Model url="/models/Lower.obj" color={color2} opacity={opacity2} visible={visible2} />
+                    <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
+
+                <OrbitControls 
+                    enablePan={true} 
+                    enableZoom={true} 
+                    minPolarAngle={0} 
+                    maxPolarAngle={Math.PI} 
+                    minAzimuthAngle={-Infinity} 
+                    maxAzimuthAngle={Infinity} 
+                />
             </Canvas>
         </div>
     )
