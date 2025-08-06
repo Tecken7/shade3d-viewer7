@@ -112,13 +112,19 @@ export default function Page() {
                 <input type="range" min={0} max={2} step={0.01} value={lightIntensity} onChange={(e) => setLightIntensity(parseFloat(e.target.value))} />
 
                 <div style={{ marginTop: '10px' }}>🔦 Light 1 Position:</div>
+                <div>X:</div>
                 <input type="range" min={-10} max={10} step={0.1} value={lightPosX} onChange={(e) => setLightPosX(parseFloat(e.target.value))} />
+                <div>Y:</div>
                 <input type="range" min={-10} max={10} step={0.1} value={lightPosY} onChange={(e) => setLightPosY(parseFloat(e.target.value))} />
+                <div>Z:</div>
                 <input type="range" min={-10} max={10} step={0.1} value={lightPosZ} onChange={(e) => setLightPosZ(parseFloat(e.target.value))} />
 
                 <div style={{ marginTop: '10px' }}>🔦 Light 2 Position:</div>
+                <div>X:</div>
                 <input type="range" min={-10} max={10} step={0.1} value={light2PosX} onChange={(e) => setLight2PosX(parseFloat(e.target.value))} />
+                <div>Y:</div>
                 <input type="range" min={-10} max={10} step={0.1} value={light2PosY} onChange={(e) => setLight2PosY(parseFloat(e.target.value))} />
+                <div>Z:</div>
                 <input type="range" min={-10} max={10} step={0.1} value={light2PosZ} onChange={(e) => setLight2PosZ(parseFloat(e.target.value))} />
             </div>
 
@@ -146,7 +152,7 @@ export default function Page() {
                     noZoom={true}
                     noPan={false}
                     staticMoving={true}
-                    rotateSpeed={5}
+                    rotateSpeed={2.5}
                     panSpeed={0.8}
                 />
             </Canvas>
