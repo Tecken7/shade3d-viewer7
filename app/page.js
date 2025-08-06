@@ -78,11 +78,12 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
-                <OrbitControls
-                    enablePan={true}
-                    enableZoom={true}
-                    minPolarAngle={0}
-                    maxPolarAngle={Math.PI}
+                {/* 🔁 OrbitControls s plným rozsahem rotace */}
+                <OrbitControls 
+                    enablePan={true} 
+                    enableZoom={true} 
+                    minPolarAngle={0} 
+                    maxPolarAngle={Math.PI} 
                 />
             </Canvas>
         </div>
