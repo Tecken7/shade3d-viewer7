@@ -77,7 +77,13 @@ export default function Page() {
                     <Model url="/models/Lower.obj" color={color2} opacity={opacity2} visible={visible2} />
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
-                <OrbitControls />
+
+                <OrbitControls
+                    enablePan={true}
+                    enableZoom={true}
+                    minPolarAngle={0}
+                    maxPolarAngle={Math.PI}
+                />
             </Canvas>
         </div>
     )
