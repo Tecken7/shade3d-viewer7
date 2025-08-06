@@ -1,13 +1,36 @@
 'use client'
 
-import { Canvas, useLoader } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
-import { Suspense, useState, useRef } from 'react'
+import { Suspense, useState, useRef, useCallback } from 'react'
 
-function Model({ url, color, opacity, visible }) {
+function DraggableModel({ url, color, opacity, visible }) {
     const obj = useLoader(OBJLoader, url)
+    const groupRef = useRef()
+
+    const isDragging = useRef(false)
+    const previousX = useRef(0)
+
+    const handlePointerDown = useCallback((e) => {
+        isDragging.current = true
+        previousX.current = e.clientX || e.touches?.[0]?.clientX || 0
+    }, [])
+
+    const handlePointerMove = useCallback((e) => {
+        if (!isDragging.current) return
+        const clientX = e.clientX || e.touches?.[0]?.clientX || 0
+        const deltaX = clientX - previousX.current
+        previousX.current = clientX
+        if (groupRef.current) {
+            groupRef.current.rotation.y += deltaX * 0.01
+        }
+    }, [])
+
+    const handlePointerUp = useCallback(() => {
+        isDragging.current = false
+    }, [])
+
     const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(color),
         transparent: true,
@@ -16,12 +39,27 @@ function Model({ url, color, opacity, visible }) {
         roughness: 0.5,
         side: THREE.DoubleSide,
     })
+
     obj.traverse((child) => {
         if (child.isMesh) {
             child.material = material
         }
     })
-    return visible ? <primitive object={obj} /> : null
+
+    return visible ? (
+        <group
+            ref={groupRef}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            onTouchStart={handlePointerDown}
+            onTouchMove={handlePointerMove}
+            onTouchEnd={handlePointerUp}
+        >
+            <primitive object={obj} />
+        </group>
+    ) : null
 }
 
 export default function Page() {
@@ -73,18 +111,10 @@ export default function Page() {
                 <directionalLight ref={dirLightRef2} position={[-5, -5, -5]} intensity={lightIntensity * 1.0} />
 
                 <Suspense fallback={null}>
-                    <Model url="/models/Upper.obj" color={color1} opacity={opacity1} visible={visible1} />
-                    <Model url="/models/Lower.obj" color={color2} opacity={opacity2} visible={visible2} />
-                    <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
+                    <DraggableModel url="/models/Upper.obj" color={color1} opacity={opacity1} visible={visible1} />
+                    <DraggableModel url="/models/Lower.obj" color={color2} opacity={opacity2} visible={visible2} />
+                    <DraggableModel url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
-
-                {/* 🔁 OrbitControls s plným rozsahem rotace */}
-                <OrbitControls 
-                    enablePan={true} 
-                    enableZoom={true} 
-                    minPolarAngle={0} 
-                    maxPolarAngle={Math.PI} 
-                />
             </Canvas>
         </div>
     )
