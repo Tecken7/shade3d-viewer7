@@ -75,6 +75,7 @@ export default function Page() {
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
+            {/* UI Panel */}
             <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, color: 'white', fontFamily: 'sans-serif' }}>
                 <div>Upper:</div>
                 <input type="color" value={color1} onChange={(e) => setColor1(e.target.value)} />
@@ -135,11 +136,13 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
+                {/* ✅ OrbitControls s plynulou rotací (žádné zamrznutí na pólech) */}
                 <OrbitControls
                     enablePan={true}
                     enableZoom={true}
-                    minPolarAngle={0}
-                    maxPolarAngle={Math.PI}
+                    enableRotate={true}
+                    minPolarAngle={0.001}
+                    maxPolarAngle={Math.PI - 0.001}
                     minAzimuthAngle={-Infinity}
                     maxAzimuthAngle={Infinity}
                 />
