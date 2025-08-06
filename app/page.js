@@ -6,21 +6,22 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
 import { Suspense, useState, useRef } from 'react'
 
-function Model({ url, color, opacity, visible }) {
+function Model({ url, color, opacity, visible, metalness = 0.5, roughness = 0.5 }) {
     const obj = useLoader(OBJLoader, url)
+
     const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(color),
         transparent: true,
         opacity,
-        metalness: 0.5,
-        roughness: 0.5,
+        metalness,
+        roughness,
         side: THREE.DoubleSide,
     })
+
     obj.traverse((child) => {
-        if (child.isMesh) {
-            child.material = material
-        }
+        if (child.isMesh) child.material = material
     })
+
     return visible ? <primitive object={obj} /> : null
 }
 
@@ -28,12 +29,18 @@ export default function Page() {
     const [color1, setColor1] = useState('#f5f5dc')
     const [color2, setColor2] = useState('#f5f5dc')
     const [color3, setColor3] = useState('#ffffff')
+    const [color4, setColor4] = useState('#ffffff')
+
     const [opacity1, setOpacity1] = useState(1)
     const [opacity2, setOpacity2] = useState(1)
     const [opacity3, setOpacity3] = useState(1)
+    const [opacity4, setOpacity4] = useState(1)
+
     const [visible1, setVisible1] = useState(true)
     const [visible2, setVisible2] = useState(true)
     const [visible3, setVisible3] = useState(true)
+    const [visible4, setVisible4] = useState(true)
+
     const [lightIntensity, setLightIntensity] = useState(1)
 
     const dirLightRef1 = useRef()
@@ -44,27 +51,26 @@ export default function Page() {
             <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, color: 'white', fontFamily: 'sans-serif' }}>
                 <div>Upper:</div>
                 <input type="color" value={color1} onChange={(e) => setColor1(e.target.value)} />
-                <input type="range" min={0} max={1} step={0.01} value={opacity1} onChange={(e) => setOpacity1(parseFloat(e.target.value))} />
-                <button onClick={() => setVisible1(!visible1)} style={{ marginLeft: '8px' }}>
-                    {visible1 ? '👁️' : '🚫'}
-                </button>
+                <input type="range" min={0} max={1} step={0.01} value={opacity1} onChange={(e) => setOpacity1(+e.target.value)} />
+                <button onClick={() => setVisible1(!visible1)}>{visible1 ? '👁️' : '🚫'}</button>
 
-                <div style={{ marginTop: '10px' }}>Lower:</div>
+                <div style={{ marginTop: 10 }}>Lower:</div>
                 <input type="color" value={color2} onChange={(e) => setColor2(e.target.value)} />
-                <input type="range" min={0} max={1} step={0.01} value={opacity2} onChange={(e) => setOpacity2(parseFloat(e.target.value))} />
-                <button onClick={() => setVisible2(!visible2)} style={{ marginLeft: '8px' }}>
-                    {visible2 ? '👁️' : '🚫'}
-                </button>
+                <input type="range" min={0} max={1} step={0.01} value={opacity2} onChange={(e) => setOpacity2(+e.target.value)} />
+                <button onClick={() => setVisible2(!visible2)}>{visible2 ? '👁️' : '🚫'}</button>
 
-                <div style={{ marginTop: '10px' }}>Crown21:</div>
+                <div style={{ marginTop: 10 }}>Crown24:</div>
                 <input type="color" value={color3} onChange={(e) => setColor3(e.target.value)} />
-                <input type="range" min={0} max={1} step={0.01} value={opacity3} onChange={(e) => setOpacity3(parseFloat(e.target.value))} />
-                <button onClick={() => setVisible3(!visible3)} style={{ marginLeft: '8px' }}>
-                    {visible3 ? '👁️' : '🚫'}
-                </button>
+                <input type="range" min={0} max={1} step={0.01} value={opacity3} onChange={(e) => setOpacity3(+e.target.value)} />
+                <button onClick={() => setVisible3(!visible3)}>{visible3 ? '👁️' : '🚫'}</button>
 
-                <div style={{ marginTop: '10px' }}>💡 Scene Light:</div>
-                <input type="range" min={0} max={2} step={0.01} value={lightIntensity} onChange={(e) => setLightIntensity(parseFloat(e.target.value))} />
+                <div style={{ marginTop: 10 }}>Tibase:</div>
+                <input type="color" value={color4} onChange={(e) => setColor4(e.target.value)} />
+                <input type="range" min={0} max={1} step={0.01} value={opacity4} onChange={(e) => setOpacity4(+e.target.value)} />
+                <button onClick={() => setVisible4(!visible4)}>{visible4 ? '👁️' : '🚫'}</button>
+
+                <div style={{ marginTop: 10 }}>💡 Scene Light:</div>
+                <input type="range" min={0} max={2} step={0.01} value={lightIntensity} onChange={(e) => setLightIntensity(+e.target.value)} />
             </div>
 
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
@@ -76,14 +82,17 @@ export default function Page() {
                     <Model url="/models/Upper.obj" color={color1} opacity={opacity1} visible={visible1} />
                     <Model url="/models/Lower.obj" color={color2} opacity={opacity2} visible={visible2} />
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
+                    <Model
+                        url="/models/Crown22.obj"
+                        color={color4}
+                        opacity={opacity4}
+                        visible={visible4}
+                        metalness={0.8}
+                        roughness={0.1} // 👈 zrcadlový povrch
+                    />
                 </Suspense>
 
-                <OrbitControls
-                    enablePan={true}
-                    enableZoom={true}
-                    minPolarAngle={0}
-                    maxPolarAngle={Math.PI}
-                />
+                <OrbitControls />
             </Canvas>
         </div>
     )
