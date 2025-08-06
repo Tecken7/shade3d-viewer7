@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas, useLoader } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { MapControls } from '@react-three/drei'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
 import { Suspense, useState, useRef } from 'react'
@@ -40,9 +40,6 @@ export default function Page() {
 
     const [lightPos1, setLightPos1] = useState({ x: 5, y: 5, z: 5 })
     const [lightPos2, setLightPos2] = useState({ x: -5, y: -5, z: -5 })
-
-    const dirLightRef1 = useRef()
-    const dirLightRef2 = useRef()
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -88,12 +85,10 @@ export default function Page() {
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
                 <ambientLight intensity={lightIntensity * 0.4} />
                 <directionalLight
-                    ref={dirLightRef1}
                     position={[lightPos1.x, lightPos1.y, lightPos1.z]}
                     intensity={lightIntensity * 1.5}
                 />
                 <directionalLight
-                    ref={dirLightRef2}
                     position={[lightPos2.x, lightPos2.y, lightPos2.z]}
                     intensity={lightIntensity * 1.0}
                 />
@@ -104,7 +99,7 @@ export default function Page() {
                     <Model url="/models/Crown21.obj" color={color3} opacity={opacity3} visible={visible3} />
                 </Suspense>
 
-                <OrbitControls
+                <MapControls
                     enablePan={true}
                     enableZoom={true}
                     enableRotate={true}
