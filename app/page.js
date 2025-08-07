@@ -1,6 +1,6 @@
 'use client'
 
-import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useLoader, useThree, useFrame } from '@react-three/fiber'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import * as THREE from 'three'
@@ -34,9 +34,16 @@ function TouchTrackballControls() {
         const controls = new TrackballControls(camera, gl.domElement)
         controls.rotateSpeed = 5.0
         controls.zoomSpeed = 1.2
-        controls.panSpeed = 10
+        controls.panSpeed = 1.0
         controls.staticMoving = true
         controlsRef.current = controls
+
+        // Manuální úprava panování podle zoomu
+        const updatePanSpeed = () => {
+            if (camera.isOrthographicCamera) {
+                controls.panSpeed = camera.zoom * 0.4
+            }
+        }
 
         const handleTouchStart = (event) => {
             event.preventDefault()
@@ -59,7 +66,10 @@ function TouchTrackballControls() {
     }, [camera, gl])
 
     useFrame(() => {
-        controlsRef.current?.update()
+        if (controlsRef.current && camera.isOrthographicCamera) {
+            controlsRef.current.panSpeed = camera.zoom * 0.4 // dynamické škálování
+            controlsRef.current.update()
+        }
     })
 
     return null
