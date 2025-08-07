@@ -38,13 +38,6 @@ function TouchTrackballControls() {
         controls.staticMoving = true
         controlsRef.current = controls
 
-        // Manuální úprava panování podle zoomu
-        const updatePanSpeed = () => {
-            if (camera.isOrthographicCamera) {
-                controls.panSpeed = camera.zoom * 0.4
-            }
-        }
-
         const handleTouchStart = (event) => {
             event.preventDefault()
             controls.handleTouchStart(event)
@@ -67,7 +60,7 @@ function TouchTrackballControls() {
 
     useFrame(() => {
         if (controlsRef.current && camera.isOrthographicCamera) {
-            controlsRef.current.panSpeed = camera.zoom * 0.4 // dynamické škálování
+            controlsRef.current.panSpeed = camera.zoom * 0.4
             controlsRef.current.update()
         }
     })
@@ -89,6 +82,8 @@ export default function Page() {
 
     const [lightPos1, setLightPos1] = useState({ x: 5, y: 5, z: 5 })
     const [lightPos2, setLightPos2] = useState({ x: -5, y: -5, z: -5 })
+
+    const [showLights, setShowLights] = useState(false)
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
@@ -114,21 +109,29 @@ export default function Page() {
                 <div style={{ marginTop: '10px' }}>💡 Light Intensity:</div>
                 <input type="range" min={0} max={2} step={0.01} value={lightIntensity} onChange={(e) => setLightIntensity(parseFloat(e.target.value))} />
 
-                <div style={{ marginTop: '10px' }}>🔦 Light 1 Position:</div>
-                <div>X:</div>
-                <input type="range" min={-10} max={10} step={0.1} value={lightPos1.x} onChange={(e) => setLightPos1({ ...lightPos1, x: parseFloat(e.target.value) })} />
-                <div>Y:</div>
-                <input type="range" min={-10} max={10} step={0.1} value={lightPos1.y} onChange={(e) => setLightPos1({ ...lightPos1, y: parseFloat(e.target.value) })} />
-                <div>Z:</div>
-                <input type="range" min={-10} max={10} step={0.1} value={lightPos1.z} onChange={(e) => setLightPos1({ ...lightPos1, z: parseFloat(e.target.value) })} />
+                <div style={{ marginTop: '10px', cursor: 'pointer' }} onClick={() => setShowLights(!showLights)}>
+                    {showLights ? '⬇️ Světla' : '➡️ Světla'}
+                </div>
 
-                <div style={{ marginTop: '10px' }}>🔦 Light 2 Position:</div>
-                <div>X:</div>
-                <input type="range" min={-10} max={10} step={0.1} value={lightPos2.x} onChange={(e) => setLightPos2({ ...lightPos2, x: parseFloat(e.target.value) })} />
-                <div>Y:</div>
-                <input type="range" min={-10} max={10} step={0.1} value={lightPos2.y} onChange={(e) => setLightPos2({ ...lightPos2, y: parseFloat(e.target.value) })} />
-                <div>Z:</div>
-                <input type="range" min={-10} max={10} step={0.1} value={lightPos2.z} onChange={(e) => setLightPos2({ ...lightPos2, z: parseFloat(e.target.value) })} />
+                {showLights && (
+                    <div style={{ marginTop: '5px' }}>
+                        <div>🔦 Light 1 Position:</div>
+                        <div>X:</div>
+                        <input type="range" min={-10} max={10} step={0.1} value={lightPos1.x} onChange={(e) => setLightPos1({ ...lightPos1, x: parseFloat(e.target.value) })} />
+                        <div>Y:</div>
+                        <input type="range" min={-10} max={10} step={0.1} value={lightPos1.y} onChange={(e) => setLightPos1({ ...lightPos1, y: parseFloat(e.target.value) })} />
+                        <div>Z:</div>
+                        <input type="range" min={-10} max={10} step={0.1} value={lightPos1.z} onChange={(e) => setLightPos1({ ...lightPos1, z: parseFloat(e.target.value) })} />
+
+                        <div style={{ marginTop: '10px' }}>🔦 Light 2 Position:</div>
+                        <div>X:</div>
+                        <input type="range" min={-10} max={10} step={0.1} value={lightPos2.x} onChange={(e) => setLightPos2({ ...lightPos2, x: parseFloat(e.target.value) })} />
+                        <div>Y:</div>
+                        <input type="range" min={-10} max={10} step={0.1} value={lightPos2.y} onChange={(e) => setLightPos2({ ...lightPos2, y: parseFloat(e.target.value) })} />
+                        <div>Z:</div>
+                        <input type="range" min={-10} max={10} step={0.1} value={lightPos2.z} onChange={(e) => setLightPos2({ ...lightPos2, z: parseFloat(e.target.value) })} />
+                    </div>
+                )}
             </div>
 
             <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 15 }}>
